@@ -21,12 +21,20 @@ const resolvers = {
   },
 
   Mutation: {
+    //oops null books need to be deleted
     cleanBook: async (parent, { username }) => {
       const updatedUser = await User.findOneAndUpdate(
         { username: username },
         { $unset: { savedBooks: "" } },
         { new: true }
       );
+    },
+    createUser: async (parent, args ) => {
+      console.log(args.username,args.email)
+      const user = await User.create(args);
+      console.log(user)
+      const token = signToken(user);
+      return { user, token };
     },
 
     //find a user based on email; check password and send token
@@ -44,28 +52,33 @@ const resolvers = {
       const token = signToken(user);
       return { user, token };
     },
-    
-    saveBook: async (parent, { authors, description, bookId, image, link, title }, context) => {
+
+    saveBook: async (
+      parent,
+      { authors, description, bookId, image, link, title },
+      context
+    ) => {
       if (context.user) {
         const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $addToSet: { savedBooks: {
-            authors:authors,
-            description:description,
-            bookId:bookId,
-            image:image,
-            link:link,
-            title:title
-          } } },
+          {
+            $addToSet: {
+              savedBooks: {
+                authors: authors,
+                description: description,
+                bookId: bookId,
+                image: image,
+                link: link,
+                title: title,
+              },
+            },
+          },
           { new: true, runValidators: true }
         );
         return updatedUser;
       }
-      throw new AuthenticationError("you need to be logged in")
+      throw new AuthenticationError("you need to be logged in");
     },
-
-
-
 
     deleteBook: async (parent, { savedBookId }, context) => {
       console.log("==***===>", savedBookId);
