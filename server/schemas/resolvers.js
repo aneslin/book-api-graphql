@@ -21,16 +21,13 @@ const resolvers = {
   },
 
   Mutation: {
-
-    cleanBook: async (parent, {username}) => {
-      
-     
+    cleanBook: async (parent, { username }) => {
       const updatedUser = await User.findOneAndUpdate(
-        
-        {username: username},
-        { $unset: { savedBooks:""} },
-        {new: true}
-      )}, 
+        { username: username },
+        { $unset: { savedBooks: "" } },
+        { new: true }
+      );
+    },
 
     //find a user based on email; check password and send token
     login: async (parent, { email, password }) => {
@@ -47,7 +44,7 @@ const resolvers = {
       const token = signToken(user);
       return { user, token };
     },
-
+    
     saveBook: async (parent, { authors, description, bookId, image, link, title }, context) => {
       if (context.user) {
         const updatedUser = await User.findOneAndUpdate(
@@ -67,20 +64,22 @@ const resolvers = {
       throw new AuthenticationError("you need to be logged in")
     },
 
-    deleteBook: async (parent, {savedBookId}, context) => {
-      console.log("==***===>", savedBookId)
-      if (context.user){
-      const updatedUser = await User.findOneAndUpdate(
-        
-        {_id: context.user._id},
-        { $pull: { savedBooks: { bookId: savedBookId } } },
-        {new: true}
-      )
-      
-    return updatedUser
-    }
-    throw new AuthenticationError("you need to be logged in")
-    }
+
+
+
+    deleteBook: async (parent, { savedBookId }, context) => {
+      console.log("==***===>", savedBookId);
+      if (context.user) {
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $pull: { savedBooks: { bookId: savedBookId } } },
+          { new: true }
+        );
+
+        return updatedUser;
+      }
+      throw new AuthenticationError("you need to be logged in");
+    },
   },
 };
 
