@@ -12,3 +12,22 @@ mutation login($email: String!, $password: String!){
     }
 }
 `
+
+export const DELETE_BOOK = gql`
+mutation Mutation($bookId: String!) {
+  deleteBook(savedBookId: $bookId) {
+      _id
+    username
+    email
+    savedBooks {
+      bookId
+      _id
+      authors
+      description
+      image
+      link
+      title
+    }
+  }
+}
+`
